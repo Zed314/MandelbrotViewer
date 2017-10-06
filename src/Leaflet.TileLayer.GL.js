@@ -49,7 +49,7 @@ L.TileLayer.GL = L.GridLayer.extend({
 		});
 		gl.viewportWidth  = options.tileSize;
 		gl.viewportHeight = options.tileSize;
-
+		alert(gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.LOW_FLOAT).precision);
 		this._loadGLProgram();
 
 		// Init textures
