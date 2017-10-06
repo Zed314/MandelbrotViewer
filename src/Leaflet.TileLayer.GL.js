@@ -98,7 +98,7 @@ L.TileLayer.GL = L.GridLayer.extend({
 		// Force using this bit for the fragment shader. All fragment shaders
 		// will use the same predefined variants, and
 		var fragmentShaderHeader =
-			"precision highp float;\n" +
+			"precision mediump float;\n" +
 			"varying vec2 vTextureCoords;\n" +
 			"varying vec2 vCRSCoords;\n" +
 			"varying vec2 vLatLngCoords;\n";
