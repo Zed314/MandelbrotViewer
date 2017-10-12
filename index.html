@@ -3,196 +3,69 @@
 <meta charset="utf-8">
 
 <head>
-	<title>Leaflet TileLayer.GL Mandelbrot demo</title>
+	<title>Mandelbrot Viewer</title>
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet-src.js"></script>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+ <!-- For mobiles-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<script src="generationShader.js"></script>
 	<script src="src/Leaflet.TileLayer.GL.js"></script>
+		<link rel="stylesheet" href="style.css"/>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
 </head>
 
 <body>
+	<div id="map"></div>
+	<div id="mapid"/>
 
-	<h1><a href='https://gitlab.com/IvanSanchez/Leaflet.TileLayer.GL'>Leaflet.TileLayer.GL</a> Mandelbrot demo</h1>
-
-	<div id="map" style='width:100%; max-height:100%; height:600px;'></div>
-	<button onclick="changerValsGen(2);">2</button>
-	<button onclick="changerValsGen(3);">3</button>
 	<script>
+	var calcul=new calculSheet(1000,2);
 	function changerValsGen( nbExpo)
 	{
 
-		var nbIt=100;
-		var fragmentShader=``;
-		if(nbExpo===2)
-		{
-			fragmentShader = `
- 	int fractal(void) {
- 		float cx = vCRSCoords.x;
- 		float cy = vCRSCoords.y;
+		calcul.exponent=nbExpo;
+		console.log(calcul.exponent);
 
- 		float x = 0.0;
- 		float y = 0.0;
- 		float tempX = 0.0;
-
-		float tempY = 0.0;
-		float XSquare=0.0;
-		float YSquare=0.0;
-
- 		int i = 0;
- 		int runaway = 0;
- 		for (int i=1; i < `+ nbIt.toString()+`; i++) {
-				tempX=XSquare-YSquare;
-				tempY=2.0*x*y;
-				x=tempX+float(cx);
-				y=tempY+float(cy);
-				XSquare=x*x;
-				YSquare=y*y;
-			if (runaway == 0 && XSquare+ YSquare > 4.0) {
-						runaway = i;
-						break;
-			}
- 		/*	if (runaway == 0 && x * x + y * y > 4.0) {
- 				runaway = i;
- 				break;
- 			}*/
-
-
- 		}
-
- 		return runaway;
- 	}
-
- 	void main(void) {
- 		int steps = 0;
- 		float blue;
- 		float yellow;
-
- 		steps = fractal();
-
- 		if (steps != 0) {
- 			blue = float(steps) / 100.0;
- 			yellow = blue / 2.0;
-
- 			gl_FragColor = vec4(yellow, yellow, blue, 1.0);
-
- 		} else {
- 			gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
- 		}
- 	}
- 	`;
-	}
-	else if(nbExpo===3){
-		fragmentShader = `
-		int fractal(void) {
-		float cx = vCRSCoords.x;
-		float cy = vCRSCoords.y;
-
-		float x = 0.0;
-		float y = 0.0;
-		float tempX = 0.0;
-		int i = 0;
-		int runaway = 0;
-		for (int i=1; i < `+ nbIt.toString()+`; i++) {
-		 /*tempX = x * x - y * y + float(cx);
-		 y = 2.0 * x * y + float(cy);
-		 x = tempX;*/
-		 /*a3 – 3ab2 +i (3a2b – b3)*/
-		 tempX=x*x*x-3.0*x*y*y+ float(cx);
-		 y=3.0*x*x*y-y*y*y+ float(cy);
-		 x=tempX;
-		 if (runaway == 0 && x * x + y * y > 4.0) {
-			 runaway = i;
-			 break;
-		 }
-		}
-
-		return runaway;
-		}
-
-		void main(void) {
-		int steps = 0;
-		float blue;
-		float yellow;
-
-		steps = fractal();
-
-		if (steps != 0) {
-		 blue = float(steps) / 100.0;
-		 yellow = blue / 2.0;
-
-		 gl_FragColor = vec4(yellow, yellow, blue, 1.0);
-
-		} else {
-		 gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-		}
-		}
-		`;
-	}
-
-	console.log(fragmentShader);
-	var fractal = L.tileLayer.gl({
-		fragmentShader: fragmentShader,
-		// tileUrls: []
-	}).addTo(map);
+		var fractal = L.tileLayer.gl({
+			fragmentShader: calcul.genererCalculShader(),
+			// tileUrls: []
+		}).addTo(map);
 	}
 
 
 	</script>
-	<div>X:<span id="x"></div>
+<!--	<div>X:<span id="x"></div>
 	<div>Y:<span id="y"></div>
-	<div>Zoom: <span id="zoom"></div>
+	<div>Zoom: <span id="zoom"></div> -->
 
-	<p>In this demo, a WebGL shader uses the map coordinates as the only input to display the mandelbrot set.</p>
+<!--	<p>In this demo, a WebGL shader uses the map coordinates as the only input to display the mandelbrot set.</p>
 <p> Based on the great work of  <a href="https://gitlab.com/IvanSanchez/Leaflet.TileLayer.GL">Iván Sánchez Ortega</a>.</p>
+
+-->
 	<script type="text/javascript">
+			var tileSize = 256;
 
-	var fragmentShader = `
-int fractal(void) {
-	float cx = vCRSCoords.x;
-	float cy = vCRSCoords.y;
+				var mymap = L.map('mapid',{
+					crs: L.CRS.Simple,
+					minZoom: 0,
+					maxZoom: 25
+				}).setView([0, 0], 8);
 
-	float x = 0.0;
-	float y = 0.0;
-	float tempX = 0.0;
-	int i = 0;
-	int runaway = 0;
-	for (int i=1; i < 2000; i++) {
-		tempX = x * x - y * y + float(cx);
-		y = 2.0 * x * y + float(cy);
-		x = tempX;
-		if (runaway == 0 && x * x + y * y > 4.0) {
-			runaway = i;
-			break;
-		}
-	}
+			/*	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+					maxZoom: 18,
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+						'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+						'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+					id: 'mapbox.streets'
+				}).addTo(mymap);*/
+				var fractal = L.tileLayer.gl({
+					fragmentShader: calcul.genererCalculShader(),
+					// tileUrls: []
+				}).addTo(mymap);
 
-	return runaway;
-}
-
-void main(void) {
-	int steps = 0;
-	float blue;
-	float yellow;
-
-	steps = fractal();
-
-	if (steps != 0) {
-		blue = float(steps) / 2000.0;
-		yellow = blue / 2.0;
-
-		gl_FragColor = vec4(yellow, yellow, blue, 1.0);
-
-	} else {
-		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-	}
-}
-`;
-
-
-		var tileSize = 256;
 
 		var map = L.map('map',{
 			crs: L.CRS.Simple,
@@ -201,23 +74,52 @@ void main(void) {
 		}).setView([0, 0], 8);
 
 		var fractal = L.tileLayer.gl({
-			fragmentShader: fragmentShader,
+			fragmentShader: calcul.genererCalculShader(),
 			// tileUrls: []
 		}).addTo(map);
+
+		L.easyButton( '<span class="star">2</span>', function(){
+			changerValsGen(2);
+		}).addTo(map);
+		L.easyButton( '<span class="star">3</span>', function(){
+		  changerValsGen(3);
+		}).addTo(map);
+
 
 
 		function logEvent(e) { console.log(e.type); }
 
 		map.on('mousemove', function(ev){
-			document.getElementById('x').innerHTML = ev.latlng.lng;
-			document.getElementById('y').innerHTML = ev.latlng.lat;
-
+/*			document.getElementById('x').innerHTML = ev.latlng.lng;
+			document.getElementById('y').innerHTML = ev.latlng.lat;*/
 		});
 
 		map.on('zoomend', function(ev){
-			document.getElementById('zoom').innerHTML = map.getZoom();
+			/*
+			document.getElementById('zoom').innerHTML = map.getZoom();*/
 		});
 
+
+		L.Control.Watermark = L.Control.extend({
+		    onAdd: function(map) {
+
+		        return document.getElementById("mapid");
+		    },
+
+		    onRemove: function(map) {
+		        // Nothing to do here
+		    }
+		});
+
+		L.control.watermark = function(opts) {
+		    return new L.Control.Watermark(opts);
+		}
+
+		L.control.watermark({ position: 'bottomright' }).addTo(map);
+
+
 	</script>
+
+
 </body>
 </html>

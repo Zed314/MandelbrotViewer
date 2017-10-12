@@ -204,12 +204,17 @@ L.TileLayer.GL = L.GridLayer.extend({
 		gl.enable(gl.BLEND);
 
 		var tileBounds = this._tileCoordsToBounds(coords);
+				//console.log(tileBounds._southWest);
 		var west = tileBounds.getWest(),
 		    east = tileBounds.getEast(),
 		    north = tileBounds.getNorth(),
 		    south = tileBounds.getSouth();
 
-		// Create data array for LatLng buffer
+		// Create data array for LatLng buffer.
+
+		//TODO
+		//ICI on trouve latLngData, qui va nous être utile
+
 		var latLngData = [
 			// Vertex 0
 			east, north,
@@ -226,6 +231,8 @@ L.TileLayer.GL = L.GridLayer.extend({
 
 		// ...upload them to the GPU...
 		gl.bindBuffer(gl.ARRAY_BUFFER, this._LatLngBuffer);
+
+
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(latLngData), gl.STATIC_DRAW);
 
 		// ...also create data array for CRS buffer...
@@ -247,6 +254,7 @@ L.TileLayer.GL = L.GridLayer.extend({
 			// Vertex 3
 			min.x, min.y,
 		];
+
 		// ...and also upload that to the GPU...
 		gl.bindBuffer(gl.ARRAY_BUFFER, this._CRSBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(crsData), gl.STATIC_DRAW);
@@ -265,6 +273,25 @@ L.TileLayer.GL = L.GridLayer.extend({
 		var tile = L.DomUtil.create('canvas', 'leaflet-tile');
 		tile.width = tile.height = this.options.tileSize;
 		tile.onselectstart = tile.onmousemove = L.Util.falseFn;
+
+		//TODO: Workers pour le cpu!
+ //console.log("Dans createTile:");
+ //console.log(this._tileCoordsToBounds(coords)._southWest.lat);
+
+
+ //console.log(this._map);
+ 	//	var mapT = this._map;
+	//	 var tileSizeT = this.options.tileSize;
+
+		// var nwPoint = coords.scaleBy(tileSizeT);
+	//	 var sePoint = nwPoint.add(tileSizeT);
+
+		// var nw = mapT.wrapLatLng(mapT.unproject(nwPoint, coords.z));
+	//	 var se = mapT.wrapLatLng(mapT.unproject(sePoint, coords.z));
+
+  //	var truc = new L.LatLngBounds(nw, se);
+	//	console.log(nwPoint);
+
 
 		var ctx = tile.getContext('2d');
 		if (this.options.tileUrls.length === 0) {
