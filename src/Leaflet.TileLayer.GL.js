@@ -49,7 +49,9 @@ L.TileLayer.GL = L.GridLayer.extend({
 		});
 		gl.viewportWidth  = options.tileSize;
 		gl.viewportHeight = options.tileSize;
-
+		alert(gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.LOW_FLOAT).precision);
+		alert(gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.LOW_FLOAT).precision);
+		
 		this._loadGLProgram();
 
 		// Init textures
@@ -98,7 +100,7 @@ L.TileLayer.GL = L.GridLayer.extend({
 		// Force using this bit for the fragment shader. All fragment shaders
 		// will use the same predefined variants, and
 		var fragmentShaderHeader =
-			"precision highp float;\n" +
+			"precision lowp float;\n" +
 			"varying vec2 vTextureCoords;\n" +
 			"varying vec2 vCRSCoords;\n" +
 			"varying vec2 vLatLngCoords;\n";
